@@ -6,13 +6,22 @@ const config = require( './config' ),
     Twit = require( 'twit' ),
     Giphy = require( 'giphy' );
 
-const giphy = Giphy( process.env.giphy_key || config.giphy.key ),
-    tw = new Twit( {
-    	consumer_key: process.env.twitter_consumer_key || config.twitter.consumer_key,
-    	consumer_secret: process.env.twitter_consumer_secret || config.twitter.consumer_secret,
-    	access_token: process.env.twitter_access_token || config.twitter.access_token,
-    	access_token_secret: process.env.twitter_access_token_secret || config.twitter.access_token_secret
-    } ),
+const env = {
+    port: process.env.PORT || config.server.port,
+    giphy: {
+        key: process.env.giphy_key || config.giphy.key
+    },
+    twitter: {
+		consumer_key: process.env.twitter_consumer_key || config.twitter.consumer_key,
+		consumer_secret: process.env.twitter_consumer_secret || config.twitter.consumer_secret,
+		access_token: process.env.twitter_access_token || config.twitter.access_token,
+		access_token_secret: process.env.twitter_access_token_secret || config.twitter.access_token_secret
+	}
+};
+console.log( env );
+
+const giphy = Giphy( env.giphy.key ),
+    tw = new Twit( env.twitter ),
     stream = tw.stream( 'user' );
 
 let currentURL = '';
@@ -33,7 +42,7 @@ giphy.random( setFirstURL );
 
 ( function initServer(){
     // Create the HTTP Server
-    http.listen( config.server.port, e => console.log( 'listening on', process.env.PORT || config.server.port ) );
+    http.listen( env.port, e => console.log( 'listening on', env.port ) );
 
     // Tell the app where the files are and what page to serve
     app.use( express.static( __dirname + '/public' ) );
@@ -89,6 +98,7 @@ const handleRandom = ( err, data, res ) => {
     else{
         logClient( 'handleRandom', data );
         try{
+            currentURL = data.data.image_original_url;
             io.emit( 'newGIF', {
                 url: data.data.image_original_url
             } );
@@ -102,6 +112,7 @@ const handleID = ( err, data, res ) => {
     else{
         logClient( 'handleID', data );
         try{
+            currentURL = data.data.images.original.url;
             io.emit( 'newGIF', {
                 url: data.data.images.original.url
             } );
@@ -116,6 +127,7 @@ const handleTrending = ( err, data, res ) => {
         logClient( 'handleTrending', data );
         try{
             let n = Math.random() * data.data.length | 0;
+            currentURL = data.data[ n ].images.original.url;
             io.emit( 'newGIF', {
                 url: data.data[ n ].images.original.url
             } );
@@ -130,6 +142,7 @@ const handleSearch = ( err, data, res ) => {
         logClient( 'handleSearch', data );
         try{
             let n = Math.random() * data.data.length | 0;
+            currentURL = data.data[ n ].images.original.url;
             io.emit( 'newGIF', {
                 url: data.data[ n ].images.original.url
             } );
