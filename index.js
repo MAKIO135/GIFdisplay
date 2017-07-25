@@ -22,7 +22,12 @@ const setFirstURL = ( err, random, res ) => {
         console.log( "Couldn't get a start URL" );
         console.log( err );
     }
-    else currentURL = random.data.image_original_url;
+    else{
+        try{
+            currentURL = random.data.image_original_url;
+        }
+        catch( e ){}
+    }
 }
 giphy.random( setFirstURL );
 
