@@ -67,10 +67,10 @@ giphy.random( setFirstURL );
 
 
 const tweetEvent = tweet => {
-    logClient( 'newTweet', tweet );
+    if( config.debug ) logClient( 'newTweet', tweet );
 
     let txt = tweet.text.split( ' ' ).filter( w => w[ 0 ] != '@' && w[ 0 ] != '#'  ).join( ' ' );
-    logClient( 'parsedTxt', txt );
+    if( config.debug ) logClient( 'parsedTxt', txt );
 
     let hashtags = tweet.entities.hashtags.map( h => h.text );
 
@@ -96,7 +96,7 @@ stream.on( 'tweet', tweetEvent );
 const handleRandom = ( err, data, res ) => {
     if( err !== null ) console.log( err );
     else{
-        logClient( 'handleRandom', data );
+        if( config.debug ) logClient( 'handleRandom', data );
         try{
             currentURL = data.data.image_original_url;
             io.emit( 'newGIF', {
@@ -110,7 +110,7 @@ const handleRandom = ( err, data, res ) => {
 const handleID = ( err, data, res ) => {
     if( err !== null ) console.log( err );
     else{
-        logClient( 'handleID', data );
+        if( config.debug ) logClient( 'handleID', data );
         try{
             currentURL = data.data.images.original.url;
             io.emit( 'newGIF', {
@@ -124,7 +124,7 @@ const handleID = ( err, data, res ) => {
 const handleTrending = ( err, data, res ) => {
     if( err !== null ) console.log( err );
     else{
-        logClient( 'handleTrending', data );
+        if( config.debug ) logClient( 'handleTrending', data );
         try{
             let n = Math.random() * data.data.length | 0;
             currentURL = data.data[ n ].images.original.url;
@@ -139,7 +139,7 @@ const handleTrending = ( err, data, res ) => {
 const handleSearch = ( err, data, res ) => {
     if( err !== null ) console.log( err );
     else{
-        logClient( 'handleSearch', data );
+        if( config.debug ) logClient( 'handleSearch', data );
         try{
             let n = Math.random() * data.data.length | 0;
             currentURL = data.data[ n ].images.original.url;
