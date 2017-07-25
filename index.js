@@ -28,7 +28,7 @@ giphy.random( setFirstURL );
 
 ( function initServer(){
     // Create the HTTP Server
-    http.listen( config.server.port, e => console.log( 'listening on', config.server.port ) );
+    http.listen( config.server.port, e => console.log( 'listening on', process.env.PORT || config.server.port ) );
 
     // Tell the app where the files are and what page to serve
     app.use( express.static( __dirname + '/public' ) );
